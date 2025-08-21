@@ -1,0 +1,151 @@
+You are my coding agent for SabhjiGo, a web-first PWA for apartment societies and street vegetable vendors in Pune. Your goal for this session is to complete Phase 1 (scaffold + auth + data model) for a demo-ready baseline in JavaScript only (no TypeScript).
+
+Project context and constraints:
+
+Tech stack: React + Vite, JavaScript only. PWA with service worker and offline fallback. IndexedDB via Firestore persistence.
+
+Backend: Firebase Auth (phone + email) and Firestore. Enable offline persistence.
+
+Hosting: Local run now; production deploy later.
+
+Maps and SMS will be added in later phases; do not integrate maps or SMS yet.
+
+Performance: Target low-end Android devices and patchy connectivity.
+
+Security: Minimal but correct Firestore rules and emulator tests.
+
+Cost: Avoid unnecessary dependencies; keep the codebase simple.
+
+Functional scope for this session (Phase 1):
+
+Initialize Vite React PWA with Firebase SDK.
+
+Implement phone and email auth flows; on first sign-in, bootstrap users/{uid} with default role 'customer' and consent flags.
+
+Define Firestore data model (collections + example docs) and CRUD helpers.
+
+Set up routes/pages and minimal shells:
+
+/ (Landing)
+
+/vendor (Vendor dashboard)
+
+/vendor/inventory (Vendor inventory editor shell)
+
+/customer (Customer home)
+
+/share/:code (Public read-only shell; data wiring later)
+
+Service worker with offline fallback page (offline.html).
+
+Firestore security rules covering users, societies, vendors, routes, inventories, groupShares.
+
+Add composite indexes for routes and inventories.
+
+Minimal UI for consent toggles and a simple society selector component (static options for now).
+
+Data model (create these collections and use example shapes in mocks/tests):
+
+users/{uid}: { role: 'vendor'|'customer'|'admin', phone, email, displayName, societyId?, vendorId?, consent: { sms: bool, location: bool, updatedAt }, createdAt, updatedAt }
+
+societies/{societyId}: { name, area, lat, lng, groupWatch: { enabled: bool }, createdAt, updatedAt }
+
+vendors/{vendorId}: { name, vehicleType, phone, activeRouteId?, societiesServed: [societyId], createdAt, updatedAt }
+
+routes/{routeId}: { vendorId, date:'YYYY-MM-DD', status:'idle'|'enroute'|'paused'|'done', waypoints:[{ societyId, etaISO, orderIndex }], lastLocation:{ lat, lng, ts }|null, createdAt, updatedAt }
+
+inventories/{vendorId_date}: { vendorId, date, items:[{ name, unit, price, available }], updatedAt }
+
+groupShares/{shareCode}: { routeId, expiresAt, createdAt }
+
+Files to add/modify (exact paths):
+
+src/firebase.js: initialize Firebase app, Auth (local persistence), Firestore (enableIndexedDbPersistence).
+
+src/main.jsx, src/App.jsx, src/routes.jsx: router with routes listed above.
+
+src/pages/Landing.jsx, VendorDashboard.jsx, VendorInventory.jsx, CustomerHome.jsx, ShareView.jsx: simple shells with headings and TODOs.
+
+src/components/AuthGate.jsx: listens for auth state, ensures bootstrap users/{uid}.
+
+src/components/PhoneSignIn.jsx and EmailSignIn.jsx: basic sign-in UI (Recaptcha for phone).
+
+src/components/NavBar.jsx: links to the routes.
+
+src/components/ConsentToggles.jsx: toggles users/{uid}.consent.sms and consent.location.
+
+src/components/SocietySelector.jsx: simple dropdown; writes users/{uid}.societyId.
+
+src/data/users.js, vendors.js, routes.js, inventories.js: simple CRUD wrappers (get, set, update).
+
+src/utils/throttle.js: export throttleByTimeAndDistance(prev, next, minMs=20000, minMeters=30) and haversine(a,b).
+
+public/manifest.webmanifest and icons (placeholder); public/offline.html
+
+src/sw.js: install/activate, navigate request fallback to offline.html.
+
+firestore.rules: implement rules outlined below.
+
+firestore.indexes.json: add composite indexes for routes (vendorId ASC, date DESC) and inventories (vendorId ASC, date DESC).
+
+tests/rules.test.js: basic emulator tests using @firebase/rules-unit-testing.
+
+.env.sample: VITE_FIREBASE_* keys, VITE_GOOGLE_MAPS_API_KEY (unused now), VITE_ENV, VITE_SMS_PROVIDER (placeholder).
+
+Security rules (Phase 1):
+
+users/{uid}: read/update/create only if auth.uid == uid.
+
+societies: read if authenticated; write only if custom claim admin == true.
+
+vendors: read if authenticated; create/update only if admin == true.
+
+routes: read if authenticated; create/update only if request.resource.data.vendorId == request.auth.token.vendorId (vendor claim); prevent vendorId reassignment on update.
+
+inventories: read if authenticated; create/update only if request.resource.data.vendorId == request.auth.token.vendorId.
+
+groupShares/{code}: read public; create if authenticated and (admin == true or vendorId claim exists); update/delete admin only.
+
+Indexes:
+
+routes: vendorId ASC, date DESC
+
+inventories: vendorId ASC, date DESC
+
+Acceptance criteria:
+
+App runs locally; routes render.
+
+Firebase initializes from env; Firestore offline persistence enabled.
+
+Phone and email sign-in succeed; new user doc created with default role 'customer' and consent flags set to false.
+
+Consent toggles update Firestore; society selection writes users/{uid}.societyId.
+
+Offline navigation shows offline.html.
+
+Emulator security tests pass for: users self-access, public read on groupShares only, vendors cannot write others’ routes/inventories.
+
+Code is JavaScript-only, no TypeScript, minimal dependencies.
+
+Clear README in project root describing setup, env vars, run scripts, and how to execute emulator tests.
+
+Implementation details and guardrails:
+
+Avoid hot documents and keep future writes granular; helpers should be structured but simple for now.
+
+No Maps or SMS integrations in this phase; stub env keys only.
+
+Keep components minimal: headings, simple forms, and basic state; styling is not a focus.
+
+Prefer timeline/list UI conventions to prep for later phases.
+
+Now:
+
+Generate the project plan and file diff for the above scope.
+
+Create or modify the files exactly as specified.
+
+Provide the run instructions (npm scripts), and an example .env.sample.
+
+Provide a short README with steps to run locally and how to run rule tests.
