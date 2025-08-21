@@ -1,27 +1,39 @@
-import { useState, useEffect } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../firebase";
+import { useState, useEffect, useContext } from "react";
+import { UserContext } from "../contexts/UserContext";
+import { getInventory, saveInventory } from "../lib/inventory";
 import NavBar from "../components/NavBar";
-import { getInventory, updateInventoryItem } from "../data/inventories";
 
 function VendorInventory() {
-  const [user] = useAuthState(auth);
+  const user = useContext(UserContext);
   const [inventory, setInventory] = useState({ items: [] });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Load inventory from Firestore
     const loadInventory = async () => {
-      if (user) {
+      if (user && user.vendorId) {
         try {
-          const today = new Date().toISOString().split('T')[0];
-          const inventoryData = await getInventory(`${user.uid}_${today}`);
-          if (inventoryData) {
-            setInventory(inventoryData);
-          }
+          const inventoryData = await getInventory(user.vendorId);
+          setInventory(inventoryData);
         } catch (error) {
           console.error('Failed to load inventory:', error);
+          // Initialize with empty inventory if none exists
+          setInventory({
+            vendorId: user.vendorId,
+            items: [],
+            updatedAt: Date.now()
+          });
         }
+      } else if (user) {
+        // Non-vendor user, initialize with demo data
+        setInventory({
+          vendorId: 'demo',
+          items: [
+            { name: 'Tomatoes', price: 40, available: true, unit: 'per kg' },
+            { name: 'Potatoes', price: 30, available: true, unit: 'per kg' },
+            { name: 'Onions', price: 35, available: false, unit: 'per kg' }
+          ],
+          updatedAt: Date.now()
+        });
       }
       setLoading(false);
     };
@@ -30,14 +42,21 @@ function VendorInventory() {
   }, [user]);
 
   const handlePriceUpdate = async (itemIndex, newPrice) => {
-    // TODO: Update item price in Firestore
     const updatedItems = [...inventory.items];
     updatedItems[itemIndex].price = parseFloat(newPrice);
-    setInventory({ ...inventory, items: updatedItems });
+    const updatedInventory = { ...inventory, items: updatedItems };
+    setInventory(updatedInventory);
+    
+    if (user && user.vendorId) {
+      try {
+        await saveInventory(user.vendorId, updatedItems);
+      } catch (error) {
+        console.error('Error saving inventory:', error);
+      }
+    }
   };
 
   const handleAvailabilityToggle = async (itemIndex) => {
-    // TODO: Update item availability in Firestore
     const updatedItems = [...inventory.items];
     updatedItems[itemIndex].available = !updatedItems[itemIndex].available;
     setInventory({ ...inventory, items: updatedItems });

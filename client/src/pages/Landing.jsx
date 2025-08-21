@@ -4,6 +4,7 @@ import PhoneSignIn from "../components/PhoneSignIn";
 import EmailSignIn from "../components/EmailSignIn";
 import DemoAuth from "../components/DemoAuth";
 import FirebaseStatus from "../components/FirebaseStatus";
+import FirebaseTest from "../components/FirebaseTest";
 
 function Landing() {
   return (
@@ -101,6 +102,10 @@ function Landing() {
           </div>
           
           <FirebaseStatus />
+          
+          <div className="mb-8">
+            <FirebaseTest />
+          </div>
           
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             <PhoneSignIn />

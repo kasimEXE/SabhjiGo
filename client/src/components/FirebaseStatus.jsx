@@ -25,6 +25,9 @@ function FirebaseStatus() {
       results.anonymous = true;
     } catch (error) {
       console.log('Anonymous auth not configured:', error.code);
+      if (error.code !== 'auth/admin-restricted-operation') {
+        results.anonymous = false;
+      }
     }
 
     // Test Email Authentication (we can't actually test without trying to sign up)

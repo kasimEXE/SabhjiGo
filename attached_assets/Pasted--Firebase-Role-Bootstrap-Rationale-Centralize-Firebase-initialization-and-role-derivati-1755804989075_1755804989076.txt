@@ -1,0 +1,387 @@
+# Firebase & Role Bootstrap
+
+### Rationale
+
+Centralize Firebase initialization and role derivation for guards and UI.
+
+### File Ops
+
+- **new:** `src/lib/firebase.js`
+- **new:** `src/lib/auth.js`
+- **modify:** `src/main.jsx`
+
+### Snippets
+
+**`src/lib/firebase.js`**
+
+```jsx
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
+
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+enableIndexedDbPersistence(db).catch(() => {});
+export { app, auth, db };
+
+```
+
+**`src/lib/auth.js`**
+
+```jsx
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from './firebase';
+
+export function watchUser(callback) {
+  return onAuthStateChanged(auth, async (user) => {
+    if (!user) return callback(null);
+
+    const ref = doc(db, 'users', user.uid);
+    let snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+      const newUser = {
+        uid: user.uid,
+        role: 'customer',
+        phone: user.phoneNumber || null,
+        email: user.email || null,
+        displayName: user.displayName || null,
+        societies: [],
+        vendorId: null
+      };
+      await setDoc(ref, newUser, { merge: true });
+      snap = await getDoc(ref);
+    }
+
+    callback({ ...snap.data() });
+  });
+}
+
+```
+
+**`src/main.jsx`**
+
+Wrap app with user context using `watchUser`.
+
+### Acceptance Criteria
+
+- Firebase initializes with `.env` vars.
+- IndexedDB offline enabled.
+- New auth users get a default `users/{uid}` doc.
+- Routing scaffolding with role-aware home.
+
+---
+
+# Routing & Role Context
+
+### Rationale
+
+Provide MVP navigation and role-based UI.
+
+### File Ops
+
+- **modify:** `src/App.jsx`
+- **new:** `src/routes/index.jsx`
+- **new pages:** `Auth.jsx`, `Onboarding.jsx`, `Home.jsx`, `Vendor.jsx`, `Customer.jsx`, `Settings.jsx`, `Offline.jsx`
+- **new components:** `RoleGate.jsx`, `RequireAuth.jsx`, `OfflineBanner.jsx`
+
+### Snippets
+
+**`RoleGate.jsx`**
+
+```jsx
+export default function RoleGate({ role, allow, children }) {
+  if (!allow.includes(role)) return null;
+  return children;
+}
+
+```
+
+**`Home.jsx`**
+
+- If `role === 'vendor'` → show link to `/vendor`
+- Else → show link to `/customer`
+
+### Acceptance Criteria
+
+- `/home` shows vendor or customer entry based on role.
+- Unauthed users are redirected to `/auth`.
+
+---
+
+# Societies Seed & Selector
+
+### Rationale
+
+Enable society selection for vendor filtering.
+
+### File Ops
+
+- **new:** `scripts/seedSocieties.js`
+- **new:** `src/components/SocietySelect.jsx`
+- **modify:** `src/pages/Onboarding.jsx`
+
+### Snippets
+
+- `seedSocieties.js`: Node script to seed Pune societies.
+- `SocietySelect.jsx`: Loads societies from Firestore, allows multi-select, writes to `users/{uid}.societies`.
+
+### Acceptance Criteria
+
+- Societies exist in Firestore.
+- User can select and persist societies in onboarding.
+
+---
+
+# Vendors & Customer Flow
+
+### Rationale
+
+Customers must discover vendors serving their societies.
+
+### File Ops
+
+- **new:** `src/pages/Customer.jsx`
+- **new:** `src/components/VendorCard.jsx`
+- **new:** `src/lib/vendors.js`
+
+### Snippets
+
+**`lib/vendors.js`**
+
+```jsx
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from './firebase';
+
+export async function listVendorsForSocieties(societyIds = []) {
+  if (!societyIds.length) return [];
+  const q = query(
+    collection(db, 'vendors'),
+    where('societies', 'array-contains-any', societyIds),
+    where('active','==', true)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+```
+
+### Acceptance Criteria
+
+- Customer page shows active vendors for at least one selected society.
+
+---
+
+# Vendor Profile & Inventory
+
+### Rationale
+
+Vendors must manage availability and prices.
+
+### File Ops
+
+- **new:** `src/pages/Vendor.jsx`
+- **new:** `src/components/InventoryEditor.jsx`
+- **new:** `src/lib/inventory.js`
+
+### Snippets
+
+**`lib/inventory.js`**
+
+```jsx
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from './firebase';
+
+export async function getInventory(vendorId) {
+  const ref = doc(db, 'inventories', `inv_${vendorId}`);
+  const snap = await getDoc(ref);
+  return snap.exists() ? snap.data() : { vendorId, items: [], updatedAt: Date.now() };
+}
+
+export async function saveInventory(vendorId, items) {
+  const ref = doc(db, 'inventories', `inv_${vendorId}`);
+  await setDoc(ref, { vendorId, items, updatedAt: Date.now() }, { merge: true });
+}
+
+```
+
+`InventoryEditor.jsx`: UI to edit items, toggle availability, set prices.
+
+### Acceptance Criteria
+
+- Vendors can update inventory → persists to `inventories/{inv_vendorId}`.
+
+---
+
+# Customer Inventory View
+
+### Rationale
+
+Customers need a daily preview of items.
+
+### File Ops
+
+- **new:** `src/components/InventoryView.jsx`
+- **modify:** `src/pages/Customer.jsx`
+
+### Snippets
+
+- `InventoryView.jsx`: Reads `inventories/{inv_vendorId}` and renders read-only list.
+
+### Acceptance Criteria
+
+- Customers can view vendor inventory read-only.
+
+---
+
+# Privacy & Consent
+
+### Rationale
+
+Ensure PII minimization and explicit user consent.
+
+### File Ops
+
+- **modify:** `src/pages/Settings.jsx`
+- **new:** `src/components/PrivacyToggles.jsx`
+
+### Snippets
+
+- `users`: `{ consent: { sms: false, location: false } }`
+- `vendors`: privacy fields as per model.
+
+### Acceptance Criteria
+
+- Users can opt-in/out, persisted in Firestore.
+
+---
+
+# Offline & Service Worker
+
+### Rationale
+
+Enable offline-first UX on low-end devices.
+
+### File Ops
+
+- **modify:** `vite.config.js`
+- **new:** `public/sw.js`
+- **new:** `src/lib/idb.js`
+
+### Snippets
+
+- `sw.js`: Precache manifest, cache-first for icons, runtime caching.
+- `idb.js`: Tiny IndexedDB wrapper (e.g. `idb-keyval`).
+
+### Acceptance Criteria
+
+- App loads offline after first visit.
+- Vendor list + last-known inventories visible offline.
+
+---
+
+# Firestore Security & Testing
+
+### Rationale
+
+Lock down access early with rules + tests.
+
+### File Ops
+
+- **modify:** `firestore.rules`
+- **new:** `firestore.indexes.json`
+- **new:** `tests/rules.test.js`
+
+### Snippets
+
+**`firestore.rules`** (outline)
+
+```jsx
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    function isVendor(vId) {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.vendorId == vId;
+    }
+
+    match /users/{uid} {
+      allow read, update: if isSignedIn() && request.auth.uid == uid;
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow list: if false;
+    }
+
+    match /societies/{sid} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /vendors/{vid} {
+      allow read: if isSignedIn();
+      allow write: if isVendor(vid) || isAdmin();
+    }
+
+    match /inventories/{iid} {
+      allow read: if isSignedIn();
+      allow write: if isVendor(resource.data.vendorId) ||
+                    isVendor(request.resource.data.vendorId) || isAdmin();
+    }
+
+    match /routes/{rid} {
+      allow read, write: if isSignedIn(); // tighten later
+    }
+
+    match /publicShare/{sid} {
+      allow read: if resource.data.expiresAt > request.time.toMillis();
+      allow write: if isAdmin();
+    }
+  }
+}
+
+```
+
+### Acceptance Criteria
+
+- Emulator tests pass.
+- Unauthed access denied except societies read + valid publicShare reads.
+
+---
+
+# Seed Scripts & Demo Data
+
+### Rationale
+
+Provide demo-ready setup with Pune societies + sample vendor.
+
+### File Ops
+
+- **new:** `scripts/seedVendors.js`
+- **new:** `scripts/seedInventories.js`
+
+### Snippets
+
+- Minimal arrays, write to Firestore.
+
+### Acceptance Criteria
+
+- One vendor linked to 2 Pune societies with a basic inventory.
+
+---

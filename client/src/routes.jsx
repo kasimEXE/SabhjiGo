@@ -6,7 +6,7 @@ import CustomerHome from "./pages/CustomerHome";
 import ShareView from "./pages/ShareView";
 import NotFound from "./pages/not-found";
 
-function Router() {
+function Router({ user }) {
   return (
     <Switch>
       <Route path="/" component={Landing} />
