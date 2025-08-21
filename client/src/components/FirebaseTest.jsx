@@ -2,6 +2,7 @@ import { useState } from "react";
 import { signInAnonymously, signOut } from "firebase/auth";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { auth, db } from "../firebase";
+import { validateFirebaseConfig } from "../utils/configValidator";
 
 function FirebaseTest() {
   const [testResults, setTestResults] = useState({});
@@ -10,6 +11,16 @@ function FirebaseTest() {
   const runTests = async () => {
     setLoading(true);
     const results = {};
+
+    // Test 0: Configuration Validation
+    const configValidation = validateFirebaseConfig();
+    results.configValidation = configValidation;
+
+    if (!configValidation.isValid) {
+      setTestResults(results);
+      setLoading(false);
+      return;
+    }
 
     // Test 1: Anonymous Authentication
     try {
@@ -84,11 +95,37 @@ function FirebaseTest() {
 
       {Object.keys(testResults).length > 0 && (
         <div className="space-y-4">
-          <div className={`p-4 rounded-lg ${
-            testResults.anonymousAuth?.success 
-              ? 'bg-green-50 border-green-200' 
-              : 'bg-red-50 border-red-200'
-          } border`}>
+          {testResults.configValidation && (
+            <div className={`p-4 rounded-lg ${
+              testResults.configValidation.isValid 
+                ? 'bg-green-50 border-green-200' 
+                : 'bg-red-50 border-red-200'
+            } border`}>
+              <h4 className="font-medium mb-2">
+                <i className={`fas ${testResults.configValidation.isValid ? 'fa-check' : 'fa-times'} mr-2`}></i>
+                Firebase Configuration
+              </h4>
+              {testResults.configValidation.isValid ? (
+                <p className="text-sm text-green-700">All configuration values are properly set</p>
+              ) : (
+                <div className="text-sm">
+                  {testResults.configValidation.errors.map((error, index) => (
+                    <p key={index} className="text-red-700">• {error}</p>
+                  ))}
+                  <p className="text-red-600 mt-2 font-medium">
+                    Please follow the setup guide to configure your Firebase environment variables.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {testResults.anonymousAuth && (
+            <div className={`p-4 rounded-lg ${
+              testResults.anonymousAuth?.success 
+                ? 'bg-green-50 border-green-200' 
+                : 'bg-red-50 border-red-200'
+            } border`}>
             <h4 className="font-medium mb-2">
               <i className={`fas ${testResults.anonymousAuth?.success ? 'fa-check' : 'fa-times'} mr-2`}></i>
               Anonymous Authentication
