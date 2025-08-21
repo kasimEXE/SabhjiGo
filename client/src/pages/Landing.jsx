@@ -2,6 +2,8 @@ import { useState } from "react";
 import NavBar from "../components/NavBar";
 import PhoneSignIn from "../components/PhoneSignIn";
 import EmailSignIn from "../components/EmailSignIn";
+import DemoAuth from "../components/DemoAuth";
+import FirebaseStatus from "../components/FirebaseStatus";
 
 function Landing() {
   return (
@@ -98,9 +100,12 @@ function Landing() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <FirebaseStatus />
+          
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             <PhoneSignIn />
             <EmailSignIn />
+            <DemoAuth />
           </div>
         </div>
       </section>

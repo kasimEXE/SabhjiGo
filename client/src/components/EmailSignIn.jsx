@@ -43,6 +43,9 @@ function EmailSignIn() {
         case 'auth/invalid-email':
           errorMessage = "Please enter a valid email address.";
           break;
+        case 'auth/configuration-not-found':
+          errorMessage = "Firebase Authentication is not properly configured. Please check the setup instructions in FIREBASE_SETUP.md";
+          break;
         default:
           errorMessage = error.message;
       }

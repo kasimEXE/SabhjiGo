@@ -35,7 +35,23 @@ function PhoneSignIn() {
       setVerificationId(confirmationResult.verificationId);
       setOtpSent(true);
     } catch (error) {
-      setError(error.message);
+      let errorMessage = "Failed to send OTP. Please try again.";
+      
+      switch (error.code) {
+        case 'auth/configuration-not-found':
+          errorMessage = "Firebase Phone Authentication is not properly configured. Please check FIREBASE_SETUP.md";
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = "Too many requests. Please try again later.";
+          break;
+        case 'auth/invalid-phone-number':
+          errorMessage = "Please enter a valid phone number.";
+          break;
+        default:
+          errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
       console.error("Error sending OTP:", error);
     }
 
