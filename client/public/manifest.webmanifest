@@ -1,0 +1,45 @@
+{
+  "name": "SabhjiGo - Fresh Vegetables for Your Society",
+  "short_name": "SabhjiGo",
+  "description": "Connect with local vegetable vendors in Pune. Get fresh vegetables delivered directly to your apartment society with real-time tracking.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFAFA",
+  "theme_color": "#4CAF50",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzIiIGhlaWdodD0iNzIiIHZpZXdCb3g9IjAgMCA3MiA3MiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjcyIiBoZWlnaHQ9IjcyIiByeD0iMTYiIGZpbGw9IiM0Q0FGNTASCZ8L3JlY3Q+CjxwYXRoIGQ9Ik0zNiAyMEMyOC4yNzQgMjAgMjIgMjYuMjc0IDIyIDM0QzIyIDQxLjcyNiAyOC4yNzQgNDggMzYgNDhDNDMuNzI2IDQ4IDUwIDQxLjcyNiA1MCAzNEM1MCAyNi4yNzQgNDMuNzI2IDIwIDM2IDIwWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTM2IDI2QzMxLjU4IDI2IDI4IDI5LjU4IDI4IDM0QzI4IDM4LjQyIDMxLjU4IDQyIDM2IDQyQzQwLjQyIDQyIDQ0IDM4LjQyIDQ0IDM0QzQ0IDI5LjU4IDQwLjQyIDI2IDM2IDI2WiIgZmlsbD0iIzRDQUY1MCI+PC9wYXRoPgo8L3N2Zz4K",
+      "sizes": "72x72",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iNDIiIGZpbGw9IiM0Q0FGNTASCZ8L3JlY3Q+CjxwYXRoIGQ9Ik05NiA1M0M3NS4xMiA1MyA1OCA3MC4xMiA1OCA5MUM1OCAxMTEuODggNzUuMTIgMTI5IDk2IDEyOUMxMTYuODggMTI5IDEzNCAxMTEuODggMTM0IDkxQzEzNCA3MC4xMiAxMTYuODggNTMgOTYgNTNaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNOTYgNjlDODQuNDMgNjkgNzUgNzguNDMgNzUgOTFDNzUgMTAzLjU3IDg0LjQzIDExMyA5NiAxMTNDMTA3LjU3IDExMyAxMTcgMTAzLjU3IDExNyA5MUMxMTcgNzguNDMgMTA3LjU3IDY5IDk2IDY5WiIgZmlsbD0iIzRDQUY1MCI+PC9wYXRoPgo8L3N2Zz4K",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTEyIiBmaWxsPSIjNENBRjUwIi8+CjxwYXRoIGQ9Ik0yNTYgMTQyQzIwMS4zMiAxNDIgMTU2IDE4Ny4zMiAxNTYgMjQyQzE1NiAyOTYuNjggMjAxLjMyIDM0MiAyNTYgMzQyQzMxMC42OCAzNDIgMzU2IDI5Ni42OCAzNTYgMjQyQzM1NiAxODcuMzIgMzEwLjY4IDE0MiAyNTYgMTQyWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTI1NiAxODRDMjI0LjE1IDE4NCAyMDAgMjA4LjE1IDIwMCAyNDBDMjAwIDI3MS44NSAyMjQuMTUgMjk2IDI1NiAyOTZDMjg3Ljg1IDI5NiAzMTIgMjcxLjg1IDMxMiAyNDBDMzEyIDIwOC4xNSAyODcuODUgMTg0IDI1NiAxODRaIiBmaWxsPSIjNENBRjUwIi8+Cjwvc3ZnPgo=",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["shopping", "food", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/",
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzc1IiBoZWlnaHQ9IjgxMiIgdmlld0JveD0iMCAwIDM3NSA4MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzNzUiIGhlaWdodD0iODEyIiBmaWxsPSIjRkFGQUZBIi8+CjxyZWN0IHg9IjIwIiB5PSI2MCIgd2lkdGg9IjMzNSIgaGVpZ2h0PSI2MCIgcng9IjEyIiBmaWxsPSIjNENBRjUwIi8+Cjx0ZXh0IHg9IjE4NyIgeT0iOTUiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5TYWJoamlHbzwvdGV4dD4KPC9zdmc+",
+      "sizes": "375x812",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNCIgaGVpZ2h0PSI3NjgiIHZpZXdCb3g9IjAgMCAxMDI0IDc2OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEwMjQiIGhlaWdodD0iNzY4IiBmaWxsPSIjRkFGQUZBIi8+CjxyZWN0IHg9IjUwIiB5PSI1MCIgd2lkdGg9IjkyNCIgaGVpZ2h0PSI4MCIgcng9IjE2IiBmaWxsPSIjNENBRjUwIi8+Cjx0ZXh0IHg9IjUxMiIgeT0iMTAwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI4IiBmb250LXdlaWdodD0iYm9sZCI+U2FiaGppR288L3RleHQ+Cjwvc3ZnPg==",
+      "sizes": "1024x768",
+      "type": "image/svg+xml",
+      "form_factor": "wide"
+    }
+  ]
+}

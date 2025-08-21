@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - SabhjiGo</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #FAFAFA;
+            color: #212121;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            text-align: center;
+            max-width: 400px;
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .icon {
+            width: 64px;
+            height: 64px;
+            background: #FEE2E2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 24px;
+        }
+        h1 {
+            color: #212121;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        p {
+            color: #757575;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+        .button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background: #45a049;
+        }
+        .cached-data {
+            background: #FEF3C7;
+            border: 1px solid #F59E0B;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+        .cached-data h3 {
+            margin: 0 0 0.5rem;
+            color: #92400E;
+            font-size: 0.9rem;
+        }
+        .cached-data p {
+            margin: 0;
+            color: #92400E;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📶</div>
+        <h1>You're Offline</h1>
+        <p>
+            It looks like you're not connected to the internet. 
+            Don't worry - you can still access recently viewed data.
+        </p>
+        
+        <button class="button" onclick="window.location.reload()">
+            Try Again
+        </button>
+        
+        <div class="cached-data">
+            <h3>📋 Available Offline:</h3>
+            <p>• Recently viewed vendor information</p>
+            <p>• Your saved preferences</p>
+            <p>• Consent settings</p>
+            <p>• Society selection</p>
+        </div>
+        
+        <p style="margin-top: 1.5rem; font-size: 0.8rem;">
+            Your changes will sync automatically when you're back online.
+        </p>
+    </div>
+
+    <script>
+        // Check for connectivity and auto-reload
+        window.addEventListener('online', () => {
+            window.location.reload();
+        });
+        
+        // Show connectivity status
+        function updateStatus() {
+            if (navigator.onLine) {
+                window.location.reload();
+            }
+        }
+        
+        setInterval(updateStatus, 5000);
+    </script>
+</body>
+</html>
