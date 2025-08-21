@@ -5,10 +5,13 @@ import EmailSignIn from "../components/EmailSignIn";
 import DemoAuth from "../components/DemoAuth";
 import FirebaseStatus from "../components/FirebaseStatus";
 import FirebaseTest from "../components/FirebaseTest";
+import LocalDevMode from "../components/LocalDevMode";
+import AuthStatusBanner from "../components/AuthStatusBanner";
 
 function Landing() {
   return (
     <div className="min-h-screen bg-gray-50">
+      <AuthStatusBanner />
       <NavBar />
       
       {/* Hero Section */}
@@ -107,10 +110,11 @@ function Landing() {
             <FirebaseTest />
           </div>
           
-          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
             <PhoneSignIn />
             <EmailSignIn />
             <DemoAuth />
+            <LocalDevMode />
           </div>
         </div>
       </section>

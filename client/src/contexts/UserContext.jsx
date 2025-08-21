@@ -8,6 +8,14 @@ export function UserProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Check for development mode user first
+    const devUser = localStorage.getItem('dev_user');
+    if (devUser) {
+      setUser(JSON.parse(devUser));
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = watchUser((userData) => {
       setUser(userData);
       setLoading(false);
