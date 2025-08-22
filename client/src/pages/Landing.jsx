@@ -6,6 +6,7 @@ import DemoAuth from "../components/DemoAuth";
 import FirebaseStatus from "../components/FirebaseStatus";
 import FirebaseTest from "../components/FirebaseTest";
 import LocalDevMode from "../components/LocalDevMode";
+import DataSeeder from "../components/DataSeeder";
 import AuthStatusBanner from "../components/AuthStatusBanner";
 
 function Landing() {
@@ -110,11 +111,12 @@ function Landing() {
             <FirebaseTest />
           </div>
           
-          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-6 max-w-7xl mx-auto">
             <PhoneSignIn />
             <EmailSignIn />
             <DemoAuth />
             <LocalDevMode />
+            <DataSeeder />
           </div>
         </div>
       </section>
