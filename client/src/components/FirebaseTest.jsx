@@ -135,6 +135,7 @@ function FirebaseTest() {
               <p className="text-xs text-gray-500">Error code: {testResults.anonymousAuth.code}</p>
             )}
           </div>
+          )}
 
           {testResults.firestoreWrite && (
             <div className={`p-4 rounded-lg ${
