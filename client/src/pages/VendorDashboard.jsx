@@ -62,18 +62,16 @@ function VendorDashboard() {
 
         {/* Navigation */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <Link href="/vendor/inventory">
-            <a className="block bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <i className="fas fa-list text-green-500 text-xl"></i>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Manage Inventory</h3>
-                  <p className="text-gray-600">Update prices and availability</p>
-                </div>
+          <Link href="/vendor/inventory" className="block bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <i className="fas fa-list text-green-500 text-xl"></i>
               </div>
-            </a>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Manage Inventory</h3>
+                <p className="text-gray-600">Update prices and availability</p>
+              </div>
+            </div>
           </Link>
           
           <div className="bg-white rounded-xl p-6 shadow-lg">

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../firebase";
-import { updateUserConsent } from "../data/users";
+import { updateUserConsent, getUserData } from "../data/users";
 
 function ConsentToggles() {
   const [user] = useAuthState(auth);
@@ -10,10 +10,32 @@ function ConsentToggles() {
     location: false
   });
   const [updating, setUpdating] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // TODO: Load current consent settings from Firestore
+  // Load current consent settings from Firestore
   useEffect(() => {
-    // This would load from Firestore in real implementation
+    const loadUserConsent = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const userData = await getUserData(user.uid);
+        if (userData?.consent) {
+          setConsent({
+            sms: userData.consent.sms || false,
+            location: userData.consent.location || false
+          });
+        }
+      } catch (error) {
+        console.error('Error loading user consent:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserConsent();
   }, [user]);
 
   const handleConsentChange = async (type, value) => {
@@ -76,9 +98,11 @@ function ConsentToggles() {
         </div>
       </div>
       
-      {updating && (
+      {(updating || loading) && (
         <div className="mt-4 text-center">
-          <span className="text-sm text-gray-500">Updating preferences...</span>
+          <span className="text-sm text-gray-500">
+            {loading ? 'Loading preferences...' : 'Updating preferences...'}
+          </span>
         </div>
       )}
     </div>
