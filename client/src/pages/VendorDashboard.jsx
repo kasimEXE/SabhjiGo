@@ -25,8 +25,21 @@ function VendorDashboard() {
       
       try {
         setIsLoading(true);
-        // Use demo vendor ID or derive from user
-        const vendorId = user.uid.includes('demo') ? 'vendor-ramesh' : user.uid;
+        
+        // Determine vendor ID - for demo/anonymous users, default to vendor-ramesh
+        let vendorId;
+        
+        // Check if this is a demo/anonymous user  
+        if (user.isAnonymous || 
+            user.uid.includes('demo') || 
+            user.displayName?.includes('Demo Vendor') || 
+            user.displayName?.includes('Vendor') ||
+            user.email?.includes('demo')) {
+          vendorId = 'vendor-ramesh'; // Default to first vendor for demo
+        } else {
+          vendorId = user.uid; // Use actual user ID for real vendors
+        }
+        
         const route = await getTodayRoute(vendorId);
         setTodayRoute(route);
         
