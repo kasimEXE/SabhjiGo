@@ -5,6 +5,7 @@ import NavBar from "../components/NavBar";
 import ConsentToggles from "../components/ConsentToggles";
 import SocietySelector from "../components/SocietySelector";
 import UserDocumentViewer from "../components/UserDocumentViewer";
+import FirebaseDebugger from "../components/FirebaseDebugger";
 
 function CustomerHome() {
   const [user] = useAuthState(auth);
@@ -76,6 +77,11 @@ function CustomerHome() {
 
           {/* Privacy Settings */}
           <ConsentToggles />
+        </div>
+
+        {/* Firebase Diagnostics - Development Tool */}
+        <div className="mb-8">
+          <FirebaseDebugger />
         </div>
 
         {/* User Document Verification - Development Tool */}
