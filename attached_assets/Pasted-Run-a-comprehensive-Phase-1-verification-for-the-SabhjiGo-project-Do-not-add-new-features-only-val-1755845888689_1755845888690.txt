@@ -1,0 +1,133 @@
+Run a comprehensive Phase 1 verification for the SabhjiGo project. Do not add new features; only validate. Perform these checks in order and report pass/fail for each with evidence (files, console output, screenshots if possible). If a check fails, include the exact error and the file/line or UI location to fix.
+
+Environment and Init
+
+Confirm .env or .env.local contains VITE_FIREBASE_API_KEY, VITE_FIREBASE_PROJECT_ID, VITE_FIREBASE_APP_ID, VITE_ENV, and matches .env.sample.
+
+Start the app and verify no duplicate Firebase initialization warnings appear in console.
+
+Verify Firebase app, Auth (local persistence), and Firestore initialize without runtime errors.
+
+Routing and Pages
+
+Confirm router renders all routes:
+
+/ (Landing), /vendor, /vendor/inventory, /customer, /share/testcode
+
+Verify NavBar links navigate to each route without console errors.
+
+Capture visible headings on each page to prove render.
+
+Auth Flows and Bootstrap
+
+Ensure Email/Password and Phone providers are enabled (or present a clear setup banner).
+
+Attempt sign-in with email and with a phone test number (if configured). On first sign-in, verify users/{uid} is created with:
+
+role: "customer"
+
+consent.sms: boolean
+
+consent.location: boolean
+
+createdAt and updatedAt timestamps
+
+Show the actual document JSON (redact PII).
+
+Verify sign-out/sign-in persists session (local persistence).
+
+Local Development Mode (if enabled)
+
+Activate Development Mode from the UI.
+
+Switch roles (customer, vendor, admin) and confirm UI reacts accordingly (e.g., vendor pages accessible when vendor role is active).
+
+Verify no protected Firestore writes occur in dev mode unless explicitly mocked.
+
+Firestore Offline Persistence
+
+With app online, subscribe to a simple document (users/{uid}).
+
+Toggle DevTools to Offline, then update a user consent field in the UI.
+
+Confirm write succeeds locally without throwing, then go Online and verify the write syncs to Firestore.
+
+Provide the before/after values and timing.
+
+ConsentToggles and SocietySelector Wiring
+
+Toggle SMS and location consent; confirm users/{uid}.consent updates with updatedAt changes.
+
+Select a society in SocietySelector and verify users/{uid}.societyId is written.
+
+Refresh page; confirm values persist and hydrate into UI.
+
+Data Model CRUD Helpers
+
+Using the provided helpers in src/data:
+
+users.js: get/set/update roundtrip on current user.
+
+vendors.js: read vendor doc (use a seeded vendor).
+
+routes.js: create or update a route for a vendor (respecting schema: vendorId, date, status, waypoints, lastLocation).
+
+inventories.js: upsert inventory document keyed {vendorId_date}.
+
+Log the payloads and Firestore document ids used. Confirm writes succeed or are blocked by rules (as expected).
+
+Service Worker and Offline Fallback
+
+Verify service worker is registered.
+
+In DevTools Application tab, confirm SW active and manifest loaded.
+
+Simulate offline and navigate to a non-cached route: ensure offline.html is served as the navigation fallback.
+
+Security Rules and Indexes
+
+Run the Firestore emulator tests at tests/rules.test.js.
+
+Confirm tests pass for:
+
+users: self-read/write only
+
+societies: read auth only; write admin claim only
+
+vendors: read auth only; write admin claim only
+
+routes: read auth only; create/update only when request.auth.token.vendorId matches vendorId and vendorId is immutable on update
+
+inventories: same vendorId match requirement
+
+groupShares: public read; create for admin or vendor; update/delete admin only
+
+If tests fail, output failing cases and the rule lines to adjust.
+
+Verify firestore.indexes.json includes composite indexes:
+
+routes: vendorId ASC, date DESC
+
+inventories: vendorId ASC, date DESC
+
+Trigger a Firestore query that requires each index and confirm no index missing error appears. If error appears, output the suggested index JSON.
+
+PWA Basics
+
+Confirm public/manifest.webmanifest exists, icons referenced, and name/short_name set.
+
+Lighthouse (or equivalent quick checks): verify installable manifest and registered service worker locally (acknowledging HTTPS limitation on localhost).
+
+Confirm Add to Home Screen works on mobile/Chrome if feasible, or at least that the manifest passes the basic checks.
+
+Reporting
+
+For each step above, output:
+
+Status: PASS/FAIL
+
+Evidence: console logs, JSON snippets, screenshots if supported
+
+Fix instructions: file path and suggested change if FAIL
+
+Stop after producing a single structured verification report.
