@@ -24,11 +24,11 @@ function DemoAuth() {
       // Store role in localStorage for demo mode
       localStorage.setItem('demo_user_role', role);
       
-      // Redirect to appropriate page after a short delay to allow auth state to update
+      // Redirect to appropriate page after a longer delay to ensure user document is updated
       setTimeout(() => {
         const redirectPath = role === 'vendor' ? '/vendor' : '/customer';
         setLocation(redirectPath);
-      }, 1500); // Increased delay to ensure user document is updated
+      }, 3000); // Increased delay to ensure user document is fully updated
     } catch (error) {
       if (error.code === 'auth/configuration-not-found') {
         setError("Demo mode requires Anonymous Authentication to be enabled in Firebase Console.");

@@ -20,11 +20,23 @@ function ProtectedRoute({ component: Component, allowedRoles, ...props }) {
     const loadUserRole = async () => {
       if (user) {
         try {
+          // For demo mode, check localStorage first for immediate role
+          const demoRole = localStorage.getItem('demo_user_role');
+          
+          // Wait a bit for user document to be created/updated if this is a fresh login
+          if (user.isAnonymous && demoRole) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
+          
           const userData = await getUserData(user.uid);
-          setUserRole(userData?.role || 'customer');
+          const role = userData?.role || demoRole || 'customer';
+          console.log('Detected user role:', role, 'from userData:', userData?.role, 'demoRole:', demoRole);
+          setUserRole(role);
         } catch (error) {
           console.error('Error loading user role:', error);
-          setUserRole('customer');
+          // Fallback to demo role or customer
+          const demoRole = localStorage.getItem('demo_user_role');
+          setUserRole(demoRole || 'customer');
         }
       }
       setLoading(false);
