@@ -48,6 +48,7 @@ function ProtectedRoute({ component: Component, allowedRoles, ...props }) {
   if (allowedRoles && !allowedRoles.includes(userRole)) {
     // Redirect to appropriate home based on role
     const redirectPath = userRole === 'vendor' ? '/vendor' : '/customer';
+    console.log(`Redirecting user with role '${userRole}' to ${redirectPath}`);
     window.location.href = redirectPath;
     return null;
   }

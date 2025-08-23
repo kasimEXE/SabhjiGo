@@ -215,7 +215,7 @@ function CustomerHome() {
                           <h4 className="font-medium text-gray-900 mb-3">Today's Fresh Items</h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                             {availableItems.slice(0, 6).map((item, index) => (
-                              <div key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                              <div key={`${vendor.id}-${item.id || item.name}-${index}`} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                                 <div className="flex items-center justify-between mb-2">
                                   <span className="font-medium text-gray-900">{item.name}</span>
                                   <span className="text-green-600 font-semibold">₹{item.price}/{item.unit}</span>

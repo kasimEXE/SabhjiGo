@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { signInAnonymously } from "firebase/auth";
 import { auth } from "../firebase";
+import { useLocation } from "wouter";
 
 function DemoAuth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [, setLocation] = useLocation();
 
   const signInDemo = async (role = 'customer') => {
     setLoading(true);
@@ -22,7 +24,11 @@ function DemoAuth() {
       // Store role in localStorage for demo mode
       localStorage.setItem('demo_user_role', role);
       
-      // User will be automatically redirected by AuthGate
+      // Redirect to appropriate page after a short delay to allow auth state to update
+      setTimeout(() => {
+        const redirectPath = role === 'vendor' ? '/vendor' : '/customer';
+        setLocation(redirectPath);
+      }, 1000);
     } catch (error) {
       if (error.code === 'auth/configuration-not-found') {
         setError("Demo mode requires Anonymous Authentication to be enabled in Firebase Console.");
