@@ -1,29 +1,63 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { Link, useLocation } from "wouter";
+import { getUserData } from "../data/users";
 
 function NavBar() {
   const [user] = useAuthState(auth);
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+
+  // Load user role
+  useEffect(() => {
+    const loadUserRole = async () => {
+      if (user) {
+        try {
+          const userData = await getUserData(user.uid);
+          setUserRole(userData?.role || 'customer');
+        } catch (error) {
+          console.error('Error loading user role:', error);
+          setUserRole('customer'); // Default fallback
+        }
+      } else {
+        setUserRole(null);
+      }
+    };
+
+    loadUserRole();
+  }, [user]);
 
   const handleSignOut = async () => {
     try {
+      localStorage.removeItem('demo_user_role');
       await signOut(auth);
     } catch (error) {
       console.error('Sign out error:', error);
     }
   };
 
-  const navLinks = user ? [
-    { href: '/customer', label: 'Home', icon: 'fa-home' },
-    { href: '/vendor', label: 'Vendor', icon: 'fa-truck' },
-    { href: '/vendor/inventory', label: 'Inventory', icon: 'fa-list' }
-  ] : [
-    { href: '/', label: 'Home', icon: 'fa-home' }
-  ];
+  const getNavLinks = () => {
+    if (!user) {
+      return [{ href: '/', label: 'Home', icon: 'fa-home' }];
+    }
+    
+    if (userRole === 'vendor') {
+      return [
+        { href: '/vendor', label: 'Dashboard', icon: 'fa-home' },
+        { href: '/vendor/inventory', label: 'Inventory', icon: 'fa-list' }
+      ];
+    }
+    
+    // Default to customer links
+    return [
+      { href: '/customer', label: 'Home', icon: 'fa-home' }
+    ];
+  };
+  
+  const navLinks = getNavLinks();
 
   return (
     <nav className="bg-white shadow-lg sticky top-0 z-50">

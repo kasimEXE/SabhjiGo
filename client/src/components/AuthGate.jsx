@@ -16,9 +16,13 @@ function AuthGate({ children }) {
           const userDoc = await getDoc(userRef);
           
           if (!userDoc.exists()) {
+            // Check if this is demo mode with specific role
+            const demoRole = localStorage.getItem('demo_user_role');
+            const userRole = demoRole || 'customer';
+            
             // Bootstrap new user with default settings
             const userData = {
-              role: 'customer',
+              role: userRole,
               phone: firebaseUser.phoneNumber || null,
               email: firebaseUser.email || null,
               displayName: firebaseUser.displayName || null,

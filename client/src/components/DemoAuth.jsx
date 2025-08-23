@@ -19,6 +19,9 @@ function DemoAuth() {
       
       console.log('Demo sign-in successful:', displayName);
       
+      // Store role in localStorage for demo mode
+      localStorage.setItem('demo_user_role', role);
+      
       // User will be automatically redirected by AuthGate
     } catch (error) {
       if (error.code === 'auth/configuration-not-found') {
