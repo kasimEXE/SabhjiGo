@@ -15,9 +15,10 @@ function AuthGate({ children }) {
           const userRef = doc(db, 'users', firebaseUser.uid);
           const userDoc = await getDoc(userRef);
           
+          // Check if this is demo mode with specific role
+          const demoRole = localStorage.getItem('demo_user_role');
+          
           if (!userDoc.exists()) {
-            // Check if this is demo mode with specific role
-            const demoRole = localStorage.getItem('demo_user_role');
             const userRole = demoRole || 'customer';
             
             // Bootstrap new user with default settings
@@ -39,6 +40,17 @@ function AuthGate({ children }) {
             
             await setDoc(userRef, userData);
             console.log('User document created:', userData);
+          } else if (demoRole && firebaseUser.isAnonymous) {
+            // For demo mode (anonymous users), always update role if it's different
+            const currentData = userDoc.data();
+            if (currentData.role !== demoRole) {
+              await setDoc(userRef, {
+                ...currentData,
+                role: demoRole,
+                updatedAt: serverTimestamp()
+              }, { merge: true });
+              console.log(`Updated demo user role to: ${demoRole}`);
+            }
           }
         } catch (error) {
           console.error('Error bootstrapping user:', error);

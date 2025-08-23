@@ -28,7 +28,7 @@ function DemoAuth() {
       setTimeout(() => {
         const redirectPath = role === 'vendor' ? '/vendor' : '/customer';
         setLocation(redirectPath);
-      }, 1000);
+      }, 1500); // Increased delay to ensure user document is updated
     } catch (error) {
       if (error.code === 'auth/configuration-not-found') {
         setError("Demo mode requires Anonymous Authentication to be enabled in Firebase Console.");

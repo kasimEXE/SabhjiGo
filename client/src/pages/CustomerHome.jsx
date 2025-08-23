@@ -43,11 +43,23 @@ function CustomerHome() {
 
           // Fetch inventories for each vendor
           const inventories = {};
+          const today = new Date().toISOString().split('T')[0];
           for (const vendor of vendors) {
             try {
-              const inventory = await getInventory(vendor.id);
+              // Try to get today's inventory first
+              const todayInventoryId = `${vendor.id}_${today}`;
+              let inventory = await getInventory(todayInventoryId);
+              
+              // If today's inventory doesn't exist, try just vendor ID (fallback)
+              if (!inventory) {
+                inventory = await getInventory(vendor.id);
+              }
+              
               if (inventory && inventory.items) {
                 inventories[vendor.id] = inventory;
+                console.log(`Loaded inventory for ${vendor.name}:`, inventory.items.length, 'items');
+              } else {
+                console.log(`No inventory found for ${vendor.name}`);
               }
             } catch (error) {
               console.error(`Error fetching inventory for vendor ${vendor.id}:`, error);
@@ -182,7 +194,7 @@ function CustomerHome() {
               </div>
             ) : (
               <div className="space-y-6">
-                {activeVendors.map((vendor) => {
+                {activeVendors.map((vendor, vendorIndex) => {
                   const inventory = vendorInventories[vendor.id];
                   const hasItems = inventory && inventory.items && inventory.items.length > 0;
                   const availableItems = hasItems ? inventory.items.filter(item => 
@@ -190,7 +202,7 @@ function CustomerHome() {
                   ) : [];
                   
                   return (
-                    <div key={vendor.id} className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
+                    <div key={`vendor-${vendor.id || vendorIndex}`} className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-4">
                           <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
