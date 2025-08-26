@@ -13,27 +13,37 @@ function DemoAuth() {
     setError("");
     
     try {
-      // Sign in anonymously for demo purposes
-      const result = await signInAnonymously(auth);
+      let result;
+      
+      // If already signed in anonymously, just update the role
+      if (auth.currentUser && auth.currentUser.isAnonymous) {
+        console.log('Demo: Already signed in anonymously, updating role to:', role);
+        result = { user: auth.currentUser };
+      } else {
+        // Sign in anonymously for demo purposes
+        result = await signInAnonymously(auth);
+        console.log('Demo: New anonymous sign-in successful');
+      }
       
       // Set display name to indicate demo mode
       const displayName = role === 'vendor' ? 'Demo Vendor' : 'Demo Customer';
-      
       console.log('Demo sign-in successful:', displayName);
       
       // Store role in localStorage for demo mode
       localStorage.setItem('demo_user_role', role);
       
       // Trigger a custom event to notify AuthGate of the role change
+      console.log('Demo: Dispatching demoRoleChanged event with role:', role);
       window.dispatchEvent(new CustomEvent('demoRoleChanged', { 
         detail: { role, userId: result.user.uid } 
       }));
       
-      // Redirect to appropriate page after a longer delay to ensure user document is updated
+      // Wait a bit for the role update to process, then redirect
       setTimeout(() => {
         const redirectPath = role === 'vendor' ? '/vendor' : '/customer';
+        console.log('Demo: Redirecting to:', redirectPath);
         setLocation(redirectPath);
-      }, 4000); // Increased delay to ensure user document is fully updated
+      }, 5000); // Increased delay to ensure user document is fully updated
     } catch (error) {
       if (error.code === 'auth/configuration-not-found') {
         setError("Demo mode requires Anonymous Authentication to be enabled in Firebase Console.");

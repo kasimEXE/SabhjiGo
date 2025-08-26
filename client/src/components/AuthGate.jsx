@@ -75,9 +75,13 @@ function AuthGate({ children }) {
 
     // Listen for demo role changes (custom event from DemoAuth)
     const handleDemoRoleChange = async (e) => {
+      console.log(`AuthGate: Demo role change event received: ${e.detail.role} for user: ${e.detail.userId}`);
+      console.log(`AuthGate: Current user: ${auth.currentUser ? auth.currentUser.uid : 'none'}`);
       if (auth.currentUser && e.detail.userId === auth.currentUser.uid) {
-        console.log(`AuthGate: Demo role change event received: ${e.detail.role}`);
+        console.log(`AuthGate: Processing role change to: ${e.detail.role}`);
         await updateUserRole(auth.currentUser);
+      } else {
+        console.log(`AuthGate: User mismatch or no current user, skipping role update`);
       }
     };
 
