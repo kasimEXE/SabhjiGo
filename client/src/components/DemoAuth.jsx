@@ -24,11 +24,16 @@ function DemoAuth() {
       // Store role in localStorage for demo mode
       localStorage.setItem('demo_user_role', role);
       
+      // Trigger a custom event to notify AuthGate of the role change
+      window.dispatchEvent(new CustomEvent('demoRoleChanged', { 
+        detail: { role, userId: result.user.uid } 
+      }));
+      
       // Redirect to appropriate page after a longer delay to ensure user document is updated
       setTimeout(() => {
         const redirectPath = role === 'vendor' ? '/vendor' : '/customer';
         setLocation(redirectPath);
-      }, 3000); // Increased delay to ensure user document is fully updated
+      }, 4000); // Increased delay to ensure user document is fully updated
     } catch (error) {
       if (error.code === 'auth/configuration-not-found') {
         setError("Demo mode requires Anonymous Authentication to be enabled in Firebase Console.");

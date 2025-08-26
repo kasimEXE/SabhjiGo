@@ -8,7 +8,7 @@ function AuthGate({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const updateUserRole = async (firebaseUser) => {
       if (firebaseUser) {
         // Check if user document exists, create if not
         try {
@@ -17,6 +17,7 @@ function AuthGate({ children }) {
           
           // Check if this is demo mode with specific role
           const demoRole = localStorage.getItem('demo_user_role');
+          console.log(`AuthGate: Checking user ${firebaseUser.uid}, demo role: ${demoRole}, isAnonymous: ${firebaseUser.isAnonymous}`);
           
           if (!userDoc.exists()) {
             const userRole = demoRole || 'customer';
@@ -39,7 +40,7 @@ function AuthGate({ children }) {
             };
             
             await setDoc(userRef, userData);
-            console.log('User document created:', userData);
+            console.log('AuthGate: User document created with role:', userData.role);
           } else if (demoRole && firebaseUser.isAnonymous) {
             // For demo mode (anonymous users), always update role if it's different
             const currentData = userDoc.data();
@@ -64,12 +65,43 @@ function AuthGate({ children }) {
           console.error('Error bootstrapping user:', error);
         }
       }
-      
+    };
+
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      await updateUserRole(firebaseUser);
       setUser(firebaseUser);
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    // Listen for demo role changes (custom event from DemoAuth)
+    const handleDemoRoleChange = async (e) => {
+      if (auth.currentUser && e.detail.userId === auth.currentUser.uid) {
+        console.log(`AuthGate: Demo role change event received: ${e.detail.role}`);
+        await updateUserRole(auth.currentUser);
+      }
+    };
+
+    // Also listen for localStorage changes (demo role changes from other tabs)
+    const handleStorageChange = async (e) => {
+      if (e.key === 'demo_user_role' && auth.currentUser) {
+        console.log(`AuthGate: Demo role changed via storage to: ${e.newValue}`);
+        await updateUserRole(auth.currentUser);
+      }
+    };
+
+    window.addEventListener('demoRoleChanged', handleDemoRoleChange);
+    window.addEventListener('storage', handleStorageChange);
+
+    // Check immediately for any demo role on mount
+    if (auth.currentUser) {
+      updateUserRole(auth.currentUser);
+    }
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener('demoRoleChanged', handleDemoRoleChange);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   if (loading) {
