@@ -43,13 +43,21 @@ function AuthGate({ children }) {
           } else if (demoRole && firebaseUser.isAnonymous) {
             // For demo mode (anonymous users), always update role if it's different
             const currentData = userDoc.data();
+            console.log(`AuthGate: Found existing user with role: ${currentData.role}, demo role: ${demoRole}`);
+            
             if (currentData.role !== demoRole) {
+              console.log(`AuthGate: Updating role from ${currentData.role} to ${demoRole}`);
               await setDoc(userRef, {
                 ...currentData,
                 role: demoRole,
                 updatedAt: serverTimestamp()
               }, { merge: true });
-              console.log(`Updated demo user role to: ${demoRole}`);
+              console.log(`AuthGate: Successfully updated demo user role to: ${demoRole}`);
+              
+              // Force a small delay to ensure the update propagates
+              await new Promise(resolve => setTimeout(resolve, 500));
+            } else {
+              console.log(`AuthGate: Role already matches demo role: ${demoRole}`);
             }
           }
         } catch (error) {

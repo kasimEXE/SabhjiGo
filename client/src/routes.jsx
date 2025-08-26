@@ -23,15 +23,39 @@ function ProtectedRoute({ component: Component, allowedRoles, ...props }) {
           // For demo mode, check localStorage first for immediate role
           const demoRole = localStorage.getItem('demo_user_role');
           
-          // Wait a bit for user document to be created/updated if this is a fresh login
+          // Wait longer for user document to be updated if this is a demo login
           if (user.isAnonymous && demoRole) {
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log(`Routes: Waiting for demo role ${demoRole} to be updated in Firestore...`);
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            // Try multiple times to get updated user data
+            let userData = null;
+            let attempts = 0;
+            const maxAttempts = 5;
+            
+            while (attempts < maxAttempts) {
+              userData = await getUserData(user.uid);
+              console.log(`Routes: Attempt ${attempts + 1} - userData role: ${userData?.role}, demo role: ${demoRole}`);
+              
+              if (userData?.role === demoRole) {
+                break; // Role has been updated successfully
+              }
+              
+              attempts++;
+              if (attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+              }
+            }
+            
+            const role = userData?.role || demoRole;
+            console.log('Routes: Final detected user role:', role, 'from userData:', userData?.role, 'demoRole:', demoRole);
+            setUserRole(role);
+          } else {
+            const userData = await getUserData(user.uid);
+            const role = userData?.role || 'customer';
+            console.log('Routes: Normal user role:', role, 'from userData:', userData?.role);
+            setUserRole(role);
           }
-          
-          const userData = await getUserData(user.uid);
-          const role = userData?.role || demoRole || 'customer';
-          console.log('Detected user role:', role, 'from userData:', userData?.role, 'demoRole:', demoRole);
-          setUserRole(role);
         } catch (error) {
           console.error('Error loading user role:', error);
           // Fallback to demo role or customer
